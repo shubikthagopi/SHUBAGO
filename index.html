@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SHUBAGO — Pharmacy Management</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0b5cff"/>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app" class="app-grid">
+    <aside class="sidebar">
+      <div class="brand">
+        <h1>SHUBAGO</h1>
+        <small>Pharmacy Manager</small>
+      </div>
+      <nav>
+        <button data-route="dashboard" class="nav-btn active">Dashboard</button>
+        <button data-route="sales" class="nav-btn">Sales / Billing</button>
+        <button data-route="purchases" class="nav-btn">Purchase Entry</button>
+        <button data-route="inventory" class="nav-btn">Inventory</button>
+        <button data-route="accounts" class="nav-btn">Accounts</button>
+        <button data-route="reports" class="nav-btn">Reports</button>
+        <button data-route="settings" class="nav-btn">Settings</button>
+      </nav>
+      <div class="sidebar-footer">
+        <button id="exportBtn">Export Data</button>
+        <button id="importBtn">Import Data</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="search">
+          <input id="globalSearch" placeholder="Search products, invoices, customers..." />
+        </div>
+        <div class="top-actions">
+          <button id="installBtn" style="display:none">Install App</button>
+          <button id="syncBtn">Backup</button>
+        </div>
+      </header>
+
+      <section id="page-content" class="content">
+        <!-- pages injected here -->
+      </section>
+
+      <footer class="footer">
+        <small>SHUBAGO Pharma • Offline-ready PWA • Local demo</small>
+      </footer>
+    </main>
+  </div>
+
+  <template id="dashboard-tpl">
+    <div class="page">
+      <h2>Dashboard</h2>
+      <div class="cards">
+        <div class="card">
+          <h3 id="totalSales">₹0</h3>
+          <p>Today Sales</p>
+        </div>
+        <div class="card">
+          <h3 id="stockValue">₹0</h3>
+          <p>Inventory Value</p>
+        </div>
+        <div class="card">
+          <h3 id="lowStockCount">0</h3>
+          <p>Low Stock Items</p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Recent Sales</h3>
+        <ul id="recentSales" class="list"></ul>
+      </div>
+    </div>
+  </template>
+
+  <template id="sales-tpl">
+    <div class="page">
+      <h2>Sales / Billing</h2>
+      <div class="panel split">
+        <div>
+          <h3>Create Invoice</h3>
+          <label>Customer (optional)</label>
+          <input id="saleCustomer" placeholder="Customer name" />
+          <label>Product</label>
+          <div class="row">
+            <select id="productSelect"></select>
+            <button id="addProductBtn">Add</button>
+          </div>
+          <ul id="invoiceItems" class="list"></ul>
+          <div class="totals">
+            <div>Subtotal: <span id="subtotal">0</span></div>
+            <div>Tax: <span id="tax">0</span></div>
+            <div>Total: <strong id="total">0</strong></div>
+          </div>
+          <button id="saveInvoiceBtn" class="primary">Save Invoice</button>
+        </div>
+        <div>
+          <h3>Search Invoices</h3>
+          <input id="searchInvoice" placeholder="Invoice id or customer" />
+          <ul id="invoiceList" class="list"></ul>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="purchases-tpl">
+    <div class="page">
+      <h2>Purchase Entry</h2>
+      <div class="panel">
+        <label>Supplier</label>
+        <input id="purchaseSupplier" />
+        <label>Product</label>
+        <div class="row">
+          <select id="purchaseProductSelect"></select>
+          <button id="addPurchaseProductBtn">Add</button>
+        </div>
+        <ul id="purchaseItems" class="list"></ul>
+        <button id="savePurchaseBtn" class="primary">Save Purchase</button>
+      </div>
+    </div>
+  </template>
+
+  <template id="inventory-tpl">
+    <div class="page">
+      <h2>Inventory</h2>
+      <div class="panel split">
+        <div>
+          <h3>Products</h3>
+          <button id="newProductBtn">New Product</button>
+          <input id="filterProduct" placeholder="Filter..." />
+          <ul id="productList" class="list"></ul>
+        </div>
+        <div>
+          <h3>Product Editor</h3>
+          <div id="productEditor">
+            <label>SKU</label><input id="p_sku" />
+            <label>Name</label><input id="p_name" />
+            <label>Price (₹)</label><input id="p_price" type="number" />
+            <label>Cost (₹)</label><input id="p_cost" type="number" />
+            <label>Stock</label><input id="p_stock" type="number" />
+            <label>Low stock threshold</label><input id="p_low" type="number" />
+            <div class="row">
+              <button id="saveProductBtn" class="primary">Save</button>
+              <button id="deleteProductBtn" class="danger">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="accounts-tpl">
+    <div class="page">
+      <h2>Accounts</h2>
+      <div class="panel">
+        <h3>Receivables / Payables</h3>
+        <p>Simple ledger listing of invoices and purchases.</p>
+        <ul id="ledgerList" class="list"></ul>
+      </div>
+    </div>
+  </template>
+
+  <template id="reports-tpl">
+    <div class="page">
+      <h2>Reports</h2>
+      <div class="panel">
+        <button id="reportSalesBtn">Sales by Date</button>
+        <button id="reportStockBtn">Stock Report</button>
+        <pre id="reportOutput"></pre>
+      </div>
+    </div>
+  </template>
+
+  <template id="settings-tpl">
+    <div class="page">
+      <h2>Settings</h2>
+      <div class="panel">
+        <label>Business Name</label>
+        <input id="bizName" />
+        <label>Currency Symbol</label>
+        <input id="currency" />
+        <div class="row">
+          <button id="saveSettingsBtn" class="primary">Save</button>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
